@@ -6,7 +6,7 @@
     };
   };
 
-  "gecko-control-01" = { config, pkgs, ... }: 
+  "gecko-control-01" = { ... }: 
   { 
     deployment.tags = [ "control_plane" ]; 
     imports = [
@@ -21,7 +21,7 @@
     ];
   };
 
-  "gecko-control-02" = { config, pkgs, ... }: 
+  "gecko-control-02" = { ... }: 
   { 
     deployment.tags = [ "control_plane" ]; 
     imports = [
@@ -36,7 +36,7 @@
       ];
   };
 
-  "gecko-control-03" = { config, pkgs, ... }: 
+  "gecko-control-03" = { ... }: 
   { 
     deployment.tags = [ "control_plane" ]; 
     imports = [

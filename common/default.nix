@@ -34,7 +34,7 @@
     environment.systemPackages = with pkgs; [
     # customize as needed!
     vim git htop
-  ];
-  # Miscellaneous
-  time.timeZone = "Europe/London";
+    ];
+    # Miscellaneous
+    time.timeZone = "Europe/London";
 }
