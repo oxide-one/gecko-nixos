@@ -1,0 +1,119 @@
+[meta]
+domain = "oxide.one"
+location = "gb"
+
+# Core network information
+[core]
+domain = "core"
+network = "10.0.1.0"
+cidr = 25
+vlan = 10
+gateway = "10.0.1.1"
+
+[core.range]
+start = "10.0.1.1"
+end = "10.0.1.126"
+
+[core.dhcp]
+start = "10.0.1.20"
+end = "10.0.1.126"
+
+# Management network information
+[management]
+domain = "mgmt"
+network = "10.0.1.128"
+cidr = 26
+vlan = 11
+gateway = "10.0.1.129"
+
+[management.range]
+start = "10.0.1.129"
+end = "10.0.1.190"
+
+[management.dhcp]
+start = "10.0.1.140"
+end = "10.0.1.190"
+
+# Out network information
+[out]
+domain = "dhcp"
+network = "10.0.0.0"
+cidr = 24
+vlan = 12
+gateway = "10.0.0.1"
+
+  [out.range]
+  start = "10.0.0.1"
+  end = "10.0.0.250"
+
+  [out.dhcp]
+  start = "10.0.0.50"
+  end = "10.0.0.250"
+
+# Hosts
+[hosts.gecko-control-01] #Raspberry pi 01
+group = "control"
+address = "10.0.1.11"
+network = "core"
+mac = "e4:5f:01:0f:9c:9a"
+
+[hosts.gecko-control-02] #Raspberry pi 02
+group = "control"
+address = "10.0.1.12"
+network = "core"
+mac = "e4:5f:01:0f:8b:b3"
+
+[hosts.gecko-control-03] #Raspberry pi 03
+group = "control"
+address = "10.0.1.13"
+network = "core"
+mac = " e4:5f:01:0f:9d:71"
+
+
+[hosts.gecko-hypervisor-01] # Hypervisor 01
+group = "hypervisor"
+address = "10.0.1.14"
+network = "core"
+
+  [hosts.gecko-hypervisor-01-mgmt] # Hypervisor IPMI 01
+  group = "hypervisor"
+  hostname = "gecko-hypervisor-01"
+  address = "10.0.1.134"
+  network = "management"
+
+
+[hosts.gecko-hypervisor-02] # Hypervisor 02
+address = "10.0.1.15"
+group = "hypervisor"
+network = "core"
+
+  [hosts.gecko-hypervisor-02-mgmt] # Hypervisor IPMI 02
+  group = "hypervisor"
+  hostname = "gecko-hypervisor-02"
+  address = "10.0.1.135"
+  network = "management"
+
+
+[hosts.gecko-hypervisor-03] # Hypervisor 03
+group = "hypervisor"
+address = "10.0.1.16"
+network = "core"
+
+  [hosts.gecko-hypervisor-03-mgmt] # Hypervisor IPMI 03
+  group = "hypervisor"
+  hostname = "gecko-hypervisor-03"
+  address = "10.0.1.136"
+  network = "management"
+
+# Switches
+[hosts.switch-01]
+group = "switch"
+address = "10.0.1.147"
+network = "management"
+
+[hosts.switch-02]
+group = "switch"
+address = "10.0.1.147"
+network = "management"
+
+

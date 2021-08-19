@@ -17,14 +17,23 @@
     };
   };
   
-  config.boot.loader.raspberryPi.firmwareConfig = [
+  environment.systemPackages = with pkgs; [
+      raspberrypifw
+      raspberrypi-eeprom
+      libraspberrypi
+  ];
+
+  hardware.raspberry-pi."4".poe-hat.enable = true;
+  
+  boot.loader.raspberryPi.firmwareConfig = [
     "hdmi_force_hotplug=1"
     "hdmi_drive=2"
   ];
-
+  
   networking = {
-    interfaces.eth1.mtu = 9000;
+    interfaces."eth0".mtu = 9000;
     dhcpcd.enable = false;
+    domain = "core.gb.oxide.one";
     usePredictableInterfaceNames = false;
     defaultGateway = "10.0.1.1";
     nameservers = ["1.1.1.1"];

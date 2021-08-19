@@ -37,4 +37,16 @@
     ];
     # Miscellaneous
     time.timeZone = "Europe/London";
+
+    # Allow unfree packages
+    nixpkgs.config.allowUnfree = true;
+
+    # Set the system version
+    system.stateVersion = "21.05";
+
+    # Add the API endpoint for the kubernetes cluster
+    networking.extraHosts = 
+    ''
+        10.0.1.5 gecko-api.core.gb.oxide.one gecko-api
+    '';
 }
