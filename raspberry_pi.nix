@@ -29,13 +29,4 @@
     "hdmi_force_hotplug=1"
     "hdmi_drive=2"
   ];
-  
-  networking = {
-    interfaces."eth0".mtu = 9000;
-    dhcpcd.enable = false;
-    domain = "core.gb.oxide.one";
-    usePredictableInterfaceNames = false;
-    defaultGateway = "10.0.1.1";
-    nameservers = ["1.1.1.1"];
-  };
 }

@@ -5,27 +5,52 @@
       tags = [ "control_plane" ];
     };
   };
-    "gecko-control-01" = { ... }:
+    "gecko-control-01" = { pkgs, ... }:
     let
-      hostName = "gecko-control-01";
-      ip_address = "10.0.1.11";
+      metadata = pkgs.callPackage ./metadata/peers.nix {};
+      shortHostName = "gecko-control-01";
+      hostInfo = metadata.rawhosts."${shortHostName}";
     in
-    { 
-      deployment.tags = [ "control_plane" ]; 
-      imports = [
-        ./control_plane.nix hostName ip_address
+    {
+      # Metadata for deployment
+      deployment.tags = [ hostInfo.group ];
+      #deployment.targetHost = hostInfo.address;
+      #deployment.targetUser = "gecko";
+      imports = [ 
+        (import ./control_plane.nix shortHostName)
       ];
     };
 
-    "gecko-control-02" = { ... }: 
-    { 
-      deployment.tags = [ "control_plane" ]; 
-      imports = [./hosts/gecko-control-02/configuration.nix];
+    "gecko-control-02" = { pkgs, ... }:
+    let
+      metadata = pkgs.callPackage ./metadata/peers.nix {};
+      shortHostName = "gecko-control-02";
+      hostInfo = metadata.rawhosts."${shortHostName}";
+    in
+    {
+      # Metadata for deployment
+      deployment.tags = [ hostInfo.group ];
+      #deployment.targetHost = hostInfo.address;
+      #deployment.targetUser = "gecko";
+      imports = [ 
+        (import ./control_plane.nix shortHostName)
+      ];
     };
 
-    "gecko-control-03" = { config, pkgs, lib, ... }: 
-    { 
-      deployment.tags = [ "control_plane" ];
-      imports = [./hosts/gecko-control-03/configuration.nix];
+    "gecko-control-03" = { pkgs, ... }:
+    let
+      metadata = pkgs.callPackage ./metadata/peers.nix {};
+      shortHostName = "gecko-control-03";
+      hostInfo = metadata.rawhosts."${shortHostName}";
+    in
+    {
+      # Metadata for deployment
+      deployment.tags = [ hostInfo.group ];
+      #deployment.targetHost = hostInfo.address;
+      #deployment.targetUser = "gecko";
+      imports = [ 
+        (import ./control_plane.nix shortHostName)
+      ];
     };
 }
+

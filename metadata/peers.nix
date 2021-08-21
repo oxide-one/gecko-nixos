@@ -1,70 +1,80 @@
 # Rip of Cadey's code
+# Original source from Xe/
 { writeTextFile, lib, ... }:
+with lib;
 let
-  metadata = lib.importTOML ../network.toml;
-  hostName = { hostName, ... }:
+  metadata = importTOML ../network.toml;
+
+  # Generate a hostsFile entry
+  hostsLine = meta: 
   let
-    host = metadata.hosts."${host}";
-    network = metadata."${host.network}";
-  in {
-    hostName = "${host}"."${network.domain}";
-    fqdn = "${hostName}.${metadata.meta.location}.${metadata.meta.domain}";
-    hostsFile = "${host.address} ${hostName} ${fqdn}";
-    
+    shortHostName = meta.hostname;
+    network = metadata."${meta.network}";
+    ip_address = meta.address;
+    fqdn = makefqdn meta;
+  in "${ip_address} ${fqdn} ${shortHostName}";
+  # Generate a raw FQDN
+  makefqdn = meta:
+  let
+    shortHostName = meta.hostname;
+    network = metadata."${meta.network}";
+    fqdn = "${shortHostName}.${network.domain}.${metadata.meta.location}.${metadata.meta.domain}";
+  in fqdn;
+
+  makeSubdomain = meta:
+  let
+    shortHostName = meta.hostname;
+    network = metadata."${meta.network}";
+  in "${network.domain}.${metadata.meta.location}.${metadata.meta.domain}";
+
+  # Generate search domains
+  searchDomains = meta:
+  let
+    network = metadata."${meta.network}";
+    baseDomain = metadata.meta.domain;
+    localDomain = "${metadata.meta.location}.${baseDomain}";
+    subDomain = "${network.domain}.${localDomain}";
+  in [subDomain localDomain baseDomain ];
+
+  # Generate a DNS entry
+  dnsEntry = meta: "${meta.address} ${meta.name}";
+  # Make all entries
+  makeAll = meta: {fqdn = makefqdn meta; hostsLine = hostsLine meta; subdomain = makeSubdomain meta; searchDomains = searchDomains meta;};
+
+in with metadata; rec {
+  # Set the raw values
+  raw = metadata;
+  rawhosts = metadata.hosts;
+  # Set the networks
+  networks = {
+    core = metadata.core;
+    management = metadata.management;
+    out = metadata.out;
   };
-#   roamPeer = { network, wireguard, ... }:
-#     let
-#       net = metadata.networks."${network}";
-#       v6subnet = net.ula;
-#       extraAddrs = ({ extra_addrs ? [ ], ... }: extra_addrs) wireguard;
-#     in {
-#       allowedIPs = [
-#         "${metadata.common.ula}:${wireguard.addrs.v6}/128"
-#         "${metadata.common.gua}:${wireguard.addrs.v6}/128"
-#         "${wireguard.addrs.v4}/32"
-#       ] ++ extraAddrs;
-#       publicKey = wireguard.pubkey;
-#     };
-#   serverPeer = { network, wireguard, ip_addr, ... }:
-#     let
-#       net = metadata.networks."${network}";
-#       v6subnet = net.ula;
-#       extraAddrs = ({ extra_addrs ? [ ], ... }: extra_addrs) wireguard;
-#     in {
-#       allowedIPs = [
-#         "${metadata.common.ula}:${wireguard.addrs.v6}/128"
-#         "${metadata.common.gua}:${wireguard.addrs.v6}/128"
-#         "${wireguard.addrs.v4}/32"
-#       ] ++ (if ip_addr == "10.77.3.1" then [ "10.77.0.0/16" ] else [ ])
-#         ++ extraAddrs;
-#       publicKey = wireguard.pubkey;
-#       persistentKeepalive = 25;
-#       endpoint = "${ip_addr}:${toString wireguard.port}";
-#     };
-#   interfaceInfo = { network, wireguard, ... }:
-#     peers:
-#     let
-#       net = metadata.networks."${network}";
-#       v6subnet = net.ula;
-#     in {
-#       ips = [
-#         "${metadata.common.ula}:${wireguard.addrs.v6}/128"
-#         "${metadata.common.gua}:${wireguard.addrs.v6}/128"
-#         "${wireguard.addrs.v4}/32"
-#       ];
-#       privateKeyFile = "/root/wireguard-keys/private";
-#       listenPort = wireguard.port;
-#       inherit peers;
-#     };
-in with metadata.hosts; rec {
   # expected peer lists
-  hosts = [
-    # cloud
-    (hostName gecko-control-01)
-    (hostName gecko-control-02)
-    (hostName gecko-control-03)
-  ];
+  hostsFile =
+    ''
+    # Gecko Control
+    ${hostsLine raw.hosts.gecko-control-01}
+    ${hostsLine raw.hosts.gecko-control-02}
+    ${hostsLine raw.hosts.gecko-control-03}
+    # Switches
+    ${hostsLine raw.hosts.switch-01}
+    ${hostsLine raw.hosts.switch-02}
+    # Primary Router
+    ${hostsLine raw.hosts.router-01}
+    # Management interfaces for hypervisors
+    ${hostsLine raw.hosts.gecko-hypervisor-01-mgmt}
+    ${hostsLine raw.hosts.gecko-hypervisor-02-mgmt}
+    ${hostsLine raw.hosts.gecko-hypervisor-03-mgmt}
 
-
-  raw = metadata.hosts;
+    ${dnsEntry dns.vault}
+    ${dnsEntry dns.kubernetes}
+  '';
+  
+  func.makeAll = makeAll;
+  func.hostsLine = hostsLine;
+  func.searchDomains = searchDomains;
 }
+ 
+  
